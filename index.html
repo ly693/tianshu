@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>天枢俱乐部 · 下单</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#0a0a0f;color:#e0e0e0;min-height:100vh;padding-bottom:130px}
+.header{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);padding:24px 16px;text-align:center;border-bottom:1px solid #2a2a3a}
+.header h1{font-size:22px;color:#c9a96e;letter-spacing:2px;margin-bottom:4px}
+.header p{font-size:12px;color:#888}
+.tabs{display:flex;margin:16px 16px 0;border-bottom:1px solid #2a2a3a}
+.tab{flex:1;text-align:center;padding:10px 0;font-size:14px;color:#666;cursor:pointer;border-bottom:2px solid transparent;user-select:none}
+.tab.active{color:#c9a96e;border-bottom-color:#c9a96e}
+.section{padding:12px 16px}
+.item{display:flex;align-items:center;justify-content:space-between;padding:12px;margin-bottom:6px;background:#14141f;border-radius:8px;border:1px solid #1e1e2e}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:15px;color:#e8e8e8}
+.item-desc{font-size:11px;color:#666;margin-top:2px}
+.item-price{font-size:14px;color:#c9a96e;font-weight:bold;white-space:nowrap;margin:0 8px}
+.qty{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.qty button{width:30px;height:30px;border-radius:50%;border:1px solid #3a3a4a;background:#1a1a2e;color:#e0e0e0;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.qty button:active{background:#c9a96e;color:#0a0a0f}
+.qty span{width:24px;text-align:center;font-size:15px;font-weight:bold}
+.cart-bar{position:fixed;bottom:0;left:0;right:0;background:#14141f;border-top:1px solid #2a2a3a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;z-index:100}
+.cart-total{font-size:12px;color:#888}
+.cart-price{font-size:22px;color:#c9a96e;font-weight:bold}
+.cart-btn{background:linear-gradient(135deg,#c9a96e,#a6844e);color:#0a0a0f;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer;letter-spacing:1px;white-space:nowrap}
+.cart-btn:active{opacity:.85}
+.cart-btn:disabled{background:#333;color:#666}
+.order-popup{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);z-index:200;overflow-y:auto}
+.order-popup.show{display:block}
+.popup-inner{max-width:420px;margin:20px auto;background:#14141f;border-radius:12px;padding:24px 20px;border:1px solid #2a2a3a}
+.popup-inner h3{font-size:17px;color:#c9a96e;text-align:center;margin-bottom:16px}
+.order-list{background:#0a0a0f;border-radius:8px;padding:12px;margin-bottom:16px;max-height:160px;overflow-y:auto;font-size:13px;color:#aaa}
+.order-list .ol{display:flex;justify-content:space-between;padding:4px 0}
+.order-list .ot{display:flex;justify-content:space-between;padding:8px 0 0;margin-top:8px;border-top:1px solid #2a2a3a;font-size:15px;color:#c9a96e;font-weight:bold}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:12px;color:#888;margin-bottom:4px}
+.fld input,.fld textarea{width:100%;padding:10px;background:#0a0a0f;border:1px solid #2a2a3a;border-radius:6px;color:#e0e0e0;font-size:14px;outline:none}
+.fld input:focus,.fld textarea:focus{border-color:#c9a96e}
+.fld textarea{height:60px;resize:none}
+.btn-main{width:100%;padding:14px;background:linear-gradient(135deg,#c9a96e,#a6844e);color:#0a0a0f;border:none;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;letter-spacing:1px}
+.btn-main:active{opacity:.85}
+.btn-second{width:100%;padding:12px;background:#2a2a3a;color:#e0e0e0;border:none;border-radius:8px;font-size:14px;cursor:pointer;margin-top:10px}
+.btn-second:active{background:#3a3a4a}
+.success-icon{text-align:center;font-size:48px;margin-bottom:12px}
+.success-msg{text-align:center;color:#4caf50;font-size:16px;margin-bottom:4px}
+.success-sub{text-align:center;color:#888;font-size:12px;margin-bottom:16px}
+.order-text-box{background:#0a0a0f;border:1px solid #2a2a3a;border-radius:8px;padding:14px;font-size:12px;color:#ccc;white-space:pre-wrap;word-break:break-all;max-height:180px;overflow-y:auto;margin-bottom:14px;font-family:monospace}
+.close{position:absolute;top:12px;right:16px;background:none;border:none;color:#888;font-size:22px;cursor:pointer;z-index:10}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>天枢俱乐部</h1>
+  <p>失控进化 · 代肝守夜 · 陪玩服务</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab(0)">守夜套餐</div>
+  <div class="tab" onclick="switchTab(1)">物资代肝</div>
+  <div class="tab" onclick="switchTab(2)">陪玩服务</div>
+</div>
+
+<div id="tab0" class="section"></div>
+<div id="tab1" class="section" style="display:none"></div>
+<div id="tab2" class="section" style="display:none"></div>
+
+<div class="cart-bar">
+  <div>
+    <div class="cart-total">合计</div>
+    <div class="cart-price" id="totalPrice">¥0.00</div>
+  </div>
+  <button class="cart-btn" id="checkoutBtn" disabled onclick="showCheckout()">去下单</button>
+</div>
+
+<div class="order-popup" id="checkoutPopup">
+  <div class="popup-inner" style="position:relative">
+    <button class="close" onclick="hidePopup('checkoutPopup')">✕</button>
+    <h3>确认订单</h3>
+    <div class="order-list" id="orderList"></div>
+    <div class="fld"><label>游戏ID（必填）</label><input id="gameId" placeholder="你的失控进化游戏昵称"></div>
+    <div class="fld"><label>微信号（必填）</label><input id="wechat" placeholder="方便客服联系你"></div>
+    <div class="fld"><label>备注（选填）</label><textarea id="remark" placeholder="特殊要求、时间安排等"></textarea></div>
+    <button class="btn-main" onclick="submitOrder()">提交订单 · <span id="submitTotal">¥0.00</span></button>
+  </div>
+</div>
+
+<div class="order-popup" id="successPopup">
+  <div class="popup-inner" style="position:relative">
+    <button class="close" onclick="hidePopup('successPopup')">✕</button>
+    <div class="success-icon">✅</div>
+    <div class="success-msg">订单已生成</div>
+    <div class="success-sub">请复制下方订单信息，发送给客服确认</div>
+    <div class="order-text-box" id="orderText"></div>
+    <button class="btn-second" onclick="copyOrder()">📋 一键复制订单</button>
+    <div style="text-align:center;margin-top:10px;font-size:11px;color:#666">复制后请发送给天枢俱乐部客服微信</div>
+  </div>
+</div>
+
+<script>
+var products = {
+  guard: [
+    {name:"纯守夜 8h",desc:"基础守夜，保家不拆",price:40},
+    {name:"基础守夜 8h",desc:"废料1k+硫磺2w+木头2w+铁2w",price:65},
+    {name:"守夜炸家套餐 8h",desc:"硫磺10w",price:79.9},
+    {name:"守夜进阶炸家 8h",desc:"硫磺20w+油2.4w",price:150},
+    {name:"守夜建家套餐 8h",desc:"木头10w+铁10w，送高金",price:79.9},
+    {name:"守夜进阶建家 8h",desc:"铁30w+木头20w，送高金",price:150},
+    {name:"建家服务",desc:"专业建筑师上门建造",price:25}
+  ],
+  material: [
+    {name:"废料 1k",desc:"9.9R/k",price:9.9},
+    {name:"木头 1w",desc:"0.9R/w",price:0.9},
+    {name:"石头 1w",desc:"1.9R/w",price:1.9},
+    {name:"铁 1w",desc:"3.9R/w",price:3.9},
+    {name:"钢 1k",desc:"14.9R/k",price:14.9},
+    {name:"油 1k",desc:"6R/k",price:6},
+    {name:"布 1k",desc:"4.9R/k",price:4.9},
+    {name:"硫磺 1w",desc:"5R/w",price:5},
+    {name:"皮革 1k",desc:"4R/k",price:4},
+    {name:"二台",desc:"9.9R/个",price:9.9},
+    {name:"三台",desc:"29.9R/个",price:29.9},
+    {name:"一组零件",desc:"20R/组",price:20}
+  ],
+  play: [
+    {name:"摇光陪玩 1h",desc:"北斗末星，初入战场",price:50},
+    {name:"玉衡陪玩 1h",desc:"斗柄中央，稳如磐石",price:60},
+    {name:"天枢陪玩 1h",desc:"北斗主星，永远指北",price:80},
+    {name:"男陪 1h",desc:"技术陪玩",price:25}
+  ]
+};
+
+var cart = {};
+var currentTab = 0;
+
+function renderTab(idx) {
+  var key = ["guard","material","play"][idx];
+  var items = products[key];
+  var html = "";
+  for (var i = 0; i < items.length; i++) {
+    var p = items[i];
+    var qty = cart[p.name] || 0;
+    html += '<div class="item">';
+    html += '<div class="item-info"><div class="item-name">'+p.name+'</div><div class="item-desc">'+p.desc+'</div></div>';
+    html += '<div class="item-price">¥'+p.price.toFixed(1)+'</div>';
+    html += '<div class="qty"><button onclick="changeQty(\''+p.name+'\','+p.price+',-1,this)">-</button><span>'+qty+'</span><button onclick="changeQty(\''+p.name+'\','+p.price+',1,this)">+</button></div>';
+    html += '</div>';
+  }
+  document.getElementById("tab"+idx).innerHTML = html;
+}
+
+function changeQty(name, price, delta, btn) {
+  if (!cart[name]) cart[name] = {price:price, qty:0};
+  cart[name].qty = Math.max(0, cart[name].qty + delta);
+  btn.parentNode.querySelector("span").textContent = cart[name].qty;
+  updateTotal();
+}
+
+function updateTotal() {
+  var total = 0, count = 0;
+  for (var k in cart) { total += cart[k].price * cart[k].qty; count += cart[k].qty; }
+  document.getElementById("totalPrice").textContent = "¥"+total.toFixed(2);
+  document.getElementById("checkoutBtn").disabled = (count === 0);
+}
+
+function switchTab(idx) {
+  currentTab = idx;
+  for (var i = 0; i < 3; i++) {
+    document.getElementById("tab"+i).style.display = (i===idx)?"block":"none";
+    document.querySelectorAll(".tab")[i].classList.toggle("active", i===idx);
+  }
+}
+
+function showCheckout() {
+  var html = "", total = 0;
+  for (var k in cart) {
+    if (cart[k].qty > 0) {
+      var sub = cart[k].price * cart[k].qty;
+      html += '<div class="ol"><span>'+k+' x'+cart[k].qty+'</span><span>¥'+sub.toFixed(2)+'</span></div>';
+      total += sub;
+    }
+  }
+  html += '<div class="ot"><span>合计</span><span>¥'+total.toFixed(2)+'</span></div>';
+  document.getElementById("orderList").innerHTML = html;
+  document.getElementById("submitTotal").textContent = "¥"+total.toFixed(2);
+  document.getElementById("checkoutPopup").classList.add("show");
+}
+
+function hidePopup(id) {
+  document.getElementById(id).classList.remove("show");
+}
+
+function submitOrder() {
+  var gameId = document.getElementById("gameId").value.trim();
+  var wechat = document.getElementById("wechat").value.trim();
+  var remark = document.getElementById("remark").value.trim();
+  if (!gameId) { alert("请填写游戏ID"); return; }
+  if (!wechat) { alert("请填写微信号"); return; }
+
+  var text = "【天枢俱乐部 · 订单】\n";
+  text += "========================\n";
+  var total = 0;
+  for (var k in cart) {
+    if (cart[k].qty > 0) {
+      text += k + "  x" + cart[k].qty + "    ¥" + (cart[k].price * cart[k].qty).toFixed(2) + "\n";
+      total += cart[k].price * cart[k].qty;
+    }
+  }
+  text += "========================\n";
+  text += "合计：¥" + total.toFixed(2) + "\n\n";
+  text += "游戏ID：" + gameId + "\n";
+  text += "微信：" + wechat + "\n";
+  if (remark) text += "备注：" + remark;
+
+  document.getElementById("orderText").textContent = text;
+  document.getElementById("checkoutPopup").classList.remove("show");
+  document.getElementById("successPopup").classList.add("show");
+}
+
+function copyOrder() {
+  var text = document.getElementById("orderText").textContent;
+  var ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.left = "-9999px";
+  ta.style.top = "-9999px";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand("copy");
+    alert("已复制！请打开微信发送给客服");
+  } catch(e) {
+    alert("复制失败，请手动长按选中订单文字复制");
+  }
+  document.body.removeChild(ta);
+}
+
+// Initialize
+for (var i = 0; i < 3; i++) renderTab(i);
+switchTab(0);
+</script>
+</body>
+</html>
